@@ -1,5 +1,5 @@
-//copy this to application folder.
-delete require.cache[require.resolve('./site')];
+//this is example config file.
+//copy this to application/config/site.js
 
 module.exports = {
   cache : {
