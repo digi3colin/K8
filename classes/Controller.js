@@ -66,7 +66,9 @@ class Controller{
         return;
       }
 
-      if(!this.headerSent)await this.before();
+      if(!this.headerSent){
+        await this.before();
+      }
       if(!this.headerSent){
         for(let i = 0; i < this.mixins.length; i++){
           await this.mixins[i].execute(action);

@@ -73,6 +73,7 @@ const clearRequireCache = ()=>{
 
 const clearViewCache = ()=>{
   K8.viewPath = {};
+  K8.require('View').clearCache();
 };
 
 const reloadModuleInit = () => {
@@ -126,7 +127,7 @@ class K8 {
       clearRequireCache();
     }
 
-    if(!K8.config.cache.view === false){
+    if(K8.config.cache.view === false){
       clearViewCache();
     }
 
@@ -143,6 +144,6 @@ class K8 {
   }
 }
 
-K8.VERSION  = '0.1.51';
+K8.VERSION  = '0.1.53';
 K8.nodePackages = [];
 module.exports = K8;

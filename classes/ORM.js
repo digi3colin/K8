@@ -73,7 +73,7 @@ class ORM extends Model{
     if(this.id){
       sql = `UPDATE ${tableName} SET ${columns.map(x => `${x} = ?`).join(', ')} WHERE id = ?`;
     }else{
-      this.id = (Math.floor(Date.now()-1563741060000)/1000)*100000 + Math.floor(Math.random()*100000);
+      this.id = ( ( (Date.now() - 1563741060000) / 1000 ) | 0 ) * 100000 + ((Math.random() * 100000) & 65535);
       sql = `INSERT INTO ${tableName} (${columns.join(', ')}, id) VALUES (?, ${columns.map(x => `?`).join(', ')})`;
     }
 
