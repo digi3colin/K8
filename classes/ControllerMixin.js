@@ -15,25 +15,5 @@
  *  You should have received a copy of the GNU General Public License
  *  along with K8MVC.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-class ControllerMixin {
-  /**
-   *
-   * @param {Controller} client
-   */
-  constructor(client){
-    this.client = client;
-  }
-  async before(){}
-  async after(){}
-
-  /**
-   *
-   * @param {String} action
-   * @returns {Promise<void>}
-   */
-  async execute(action){
-    if(this[action] !== undefined)await this[action]();
-  }
-}
+const {ControllerMixin} = require('@komino/k8-core-mvc');
 module.exports = ControllerMixin;

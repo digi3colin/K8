@@ -16,6 +16,5 @@
  *  along with K8MVC.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class Model{}
-
+const {Model} = require('@komino/k8-core-mvc');
 module.exports = Model;

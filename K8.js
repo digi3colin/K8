@@ -22,8 +22,7 @@ const fs = require('fs');
 const resolve = (pathToFile, prefixPath, store)=>{
   if(!store[pathToFile]){
     //search application, then modules, then system
-    const fetchList = [`${K8.APP_PATH}/${prefixPath}/${pathToFile}`];
-
+    const fetchList = [pathToFile, `${K8.APP_PATH}/${prefixPath}/${pathToFile}`];
     [...K8.bootstrap.modules].reverse().forEach(x => fetchList.push(`${K8.MOD_PATH}/${x}/${prefixPath}/${pathToFile}`));
     fetchList.push(`${K8.SYS_PATH}/${prefixPath}/${pathToFile}`);
     [...K8.nodePackages].reverse().forEach(x => fetchList.push(`${x}/${prefixPath}/${pathToFile}`));
@@ -135,7 +134,8 @@ class K8 {
   }
 
   static require(pathToFile){
-    const file = resolve(pathToFile+'.js', 'classes', K8.classPath);
+    pathToFile = /\..*$/.test(pathToFile)? pathToFile : (pathToFile + '.js');
+    const file = resolve(pathToFile, 'classes', K8.classPath);
     return require(file);
   }
 
@@ -144,6 +144,6 @@ class K8 {
   }
 }
 
-K8.VERSION  = '0.1.53';
+K8.VERSION  = '0.2.4';
 K8.nodePackages = [];
 module.exports = K8;

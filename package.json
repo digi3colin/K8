@@ -1,24 +1,23 @@
 {
-  "name": "k8mvc",
-  "version": "0.1.53",
+  "name": "@komino/k8",
+  "version": "0.2.5",
   "description": "Node.js MVC file structure base on Kohana Framework",
-  "main": "K8.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/digi3colin/K8.git"
   },
-  "author": "Shiba Komino",
-  "license": "GPL",
+  "author": "Colin Leung",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/digi3colin/K8/issues"
   },
   "homepage": "https://github.com/digi3colin/K8#readme",
-  "dependencies": {},
-  "devDependencies": {
-    "better-sqlite3": "^5.4.3",
-    "jest": "^24.9.0"
-  }
+  "dependencies": {
+    "@komino/k8-core-mvc": "0.0.6"
+  },
+  "devDependencies": {}
 }
