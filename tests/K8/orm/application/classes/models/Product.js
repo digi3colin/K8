@@ -49,9 +49,7 @@ Product.hasMany   = [
 ];
 
 Product.belongsToMany = [
-  'Image',
   'Tag',
-  'Option'
 ];
 
 

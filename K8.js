@@ -17,6 +17,7 @@
  */
 
 const fs = require('fs');
+const {View} = require('@komino/k8-core-mvc');
 
 //private methods
 const resolve = (pathToFile, prefixPath, store)=>{
@@ -43,7 +44,7 @@ const resolve = (pathToFile, prefixPath, store)=>{
   return store[pathToFile];
 };
 
-const setPath = (EXE_PATH = null, APP_PATH = null, MOD_PATH = null) => {
+const setPath = (EXE_PATH, APP_PATH, MOD_PATH) => {
   K8.EXE_PATH = EXE_PATH || fs.realpathSync('./');
   K8.APP_PATH = APP_PATH || K8.EXE_PATH + '/application';
   K8.MOD_PATH = MOD_PATH || K8.EXE_PATH + '/modules';
@@ -72,7 +73,7 @@ const clearRequireCache = ()=>{
 
 const clearViewCache = ()=>{
   K8.viewPath = {};
-  K8.require('View').clearCache();
+  View.defaultViewClass.clearCache();
 };
 
 const reloadModuleInit = () => {
@@ -98,6 +99,7 @@ const reloadModuleInit = () => {
 
 class K8 {
   static init(EXE_PATH = null, APP_PATH = null, MOD_PATH = null){
+    K8.nodePackages = [];
     K8.config = require('./config/site');
 
     K8.classPath  = {}; //{'ORM'          => 'APP_PATH/classes/ORM.js'}
@@ -134,6 +136,7 @@ class K8 {
   }
 
   static require(pathToFile){
+    //pathToFile may include file extension;
     pathToFile = /\..*$/.test(pathToFile)? pathToFile : (pathToFile + '.js');
     const file = resolve(pathToFile, 'classes', K8.classPath);
     return require(file);
@@ -144,6 +147,5 @@ class K8 {
   }
 }
 
-K8.VERSION  = '0.2.4';
-K8.nodePackages = [];
+K8.VERSION  = '0.2.5';
 module.exports = K8;

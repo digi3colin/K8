@@ -15,14 +15,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with K8MVC.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+const pluralize = require('pluralize');
 const K8 = require('../K8');
 const Model = K8.require('Model');
 
 //static private function
 function assignTableName(model){
   model.jointTablePrefix = model.name.toLowerCase();
-  model.tableName = model.jointTablePrefix + 's';
+  model.tableName = pluralize(model.jointTablePrefix);
 }
 
 class ORM extends Model{
@@ -83,6 +83,13 @@ class ORM extends Model{
     return this;
   }
 
+  /**
+   * add belongsToMany
+   * @param {ORM} model
+   * @param {number|null} weight
+   * @returns {boolean}
+   */
+
   add(model, weight = null){
     const Model = model.constructor;
 
@@ -91,11 +98,10 @@ class ORM extends Model{
     const fk = Model.key;
 
     const record = this.prepare(`SELECT * FROM ${jointTableName} WHERE ${lk} = ? AND ${fk} = ?`).get(this.id, model.id);
-    if(record){
-      throw new Error(`${Model.tableName}(${model.id}) already linked to ${this.constructor.tableName}(${this.id})`);
-    }
+    if(record)return false;
 
     this.prepare(`INSERT INTO ${jointTableName} (${lk}, ${fk}, weight) VALUES (?, ?, ?)`).run(this.id, model.id, weight);
+    return true;
   }
 
   remove(model){

@@ -122,6 +122,17 @@ describe('orm test', ()=>{
 
         const owner = home.belongsTo('person_id');
         expect(owner.first_name).toBe('Peter');
+
+
+        const office = new Address();
+        office.address1 = 'Planet Y';
+        office.person_id = peter.id;
+        office.save();
+
+        expect(office.address1).toBe('Planet Y');
+
+        const addresses = peter.hasMany(Address);
+        expect(addresses.length).toBe(2);
     });
 
     test('instance belongsTo', () =>{
@@ -249,8 +260,297 @@ describe('orm test', ()=>{
       const Tag = K8.require('models/Tag');
       const t = new Tag(1, {database: db});
 
-      console.log(t);
-
       expect(t.name).toBe('foo');
     });
+
+    test('save', ()=>{
+      const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+      if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+      fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
+      const db = new Database(dbPath);
+      db.prepare('INSERT INTO persons (first_name, last_name) VALUES (?, ?)').run('Peter', 'Pan');
+      db.prepare('INSERT INTO addresses (person_id, address1) VALUES (?, ?)').run(1, 'Planet X');
+
+      const Person = K8.require('models/Person');
+
+      const peter = new Person(1, {database: db} );
+      peter.last_name = 'Panther';
+      peter.save();
+
+      const data = db.prepare('SELECT last_name FROM persons WHERE id = 1').get();
+      expect(data.last_name).toBe('Panther');
+    });
+
+    test('create new record', ()=>{
+      const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+      if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+      fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
+      const db = new Database(dbPath);
+      db.prepare('INSERT INTO persons (first_name, last_name) VALUES (?, ?)').run('Peter', 'Pan');
+      db.prepare('INSERT INTO addresses (person_id, address1) VALUES (?, ?)').run(1, 'Planet X');
+
+      const Person = K8.require('models/Person');
+      const alice = new Person(null, {database: db});
+      alice.first_name = 'Alice';
+      alice.last_name = 'Lee';
+      alice.save();
+
+      const data = db.prepare('SELECT * FROM persons WHERE first_name = ?').get('Alice');
+      expect(data.last_name).toBe('Lee');
+    });
+
+    test('add belongsToMany', ()=>{
+      const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+      if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+      fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+      const db = new Database(dbPath);
+
+      const ORM = require('../../classes/ORM');
+      ORM.setDB(db);
+
+      const Product = K8.require('models/Product');
+      const Tag     = K8.require('models/Tag');
+
+      const tagA = new Tag(null, {database: db});
+      tagA.name = 'white';
+      tagA.save();
+
+      const tagB = new Tag(null, {database: db});
+      tagB.name = 'liquid';
+      tagB.save();
+
+      const product = new Product(null, {database : db});
+      product.name = 'milk';
+      product.save();
+      product.add(tagA);
+      product.save();
+
+      const result1 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+      expect(result1.length).toBe(1);
+
+      product.add(tagB);
+      product.save();
+      const result2 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+      expect(result2.length).toBe(2);
+    })
+
+  test('add duplicate belongsToMany', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+    const Tag     = K8.require('models/Tag');
+
+    const tagA = new Tag(null, {database: db});
+    tagA.name = 'white';
+    tagA.save();
+
+    const product = new Product(null, {database : db});
+    product.name = 'milk';
+    product.save();
+    product.add(tagA);
+    product.save();
+
+    const result1 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result1.length).toBe(1);
+
+    const addResult = product.add(tagA);
+    product.save();
+    const result2 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result2.length).toBe(1);
+    expect(addResult).toBe(false);//model already linked;
+  });
+
+  test('remove belongsToMany', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+    const Tag     = K8.require('models/Tag');
+
+    const tagA = new Tag(null, {database: db});
+    tagA.name = 'white';
+    tagA.save();
+
+    const product = new Product(null, {database : db});
+    product.name = 'milk';
+    product.save();
+    product.add(tagA);
+    product.save();
+
+    const result1 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result1.length).toBe(1);
+
+    product.remove(tagA);
+    product.save();
+    const result2 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result2.length).toBe(0);
+  });
+
+  test('delete', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+    const product = new Product(null, {database : db});
+    product.name = 'milk';
+    product.save();
+
+    const result1 = db.prepare('SELECT * from products').all();
+    expect(result1.length).toBe(1);
+
+    product.delete();
+    const result2 = db.prepare('SELECT * from products').all();
+    expect(result2.length).toBe(0);
+  });
+
+  test('delete and remove links', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+    const Tag     = K8.require('models/Tag');
+
+    const tagA = new Tag(null, {database: db});
+    tagA.name = 'white';
+    tagA.save();
+
+    const tagB = new Tag(null, {database: db});
+    tagB.name = 'liquid';
+    tagB.save();
+
+    const product = new Product(null, {database : db});
+    product.name = 'milk';
+    product.save();
+    product.add(tagA);
+    product.add(tagB);
+    product.save();
+
+    const result1 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result1.length).toBe(2);
+
+    product.delete();
+    const result2 = db.prepare('SELECT * from product_tags WHERE product_id = ?').all(product.id);
+    expect(result2.length).toBe(0);
+
+  });
+
+  test('lazy load', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+    db.prepare('INSERT INTO products (name) VALUES (?)').run('bar');
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+
+    const product = new Product(null, {database : db});
+    product.load();
+    expect(product.name).toBe(null);
+
+    product.id = 1;
+    product.load();
+
+    expect(product.name).toBe('bar');
+
+  });
+
+  test('delete unsaved object', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+    db.prepare('INSERT INTO products (name) VALUES (?)').run('bar');
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Product = K8.require('models/Product');
+    const product = new Product(null, {database : db});
+    try{
+      product.delete();
+      expect('this line should not exec').toBe('');
+    }catch(e){
+      expect(e.message).toBe('ORM delete Error, no id defined');
+    }
+  })
+
+  test('handle hasMany target without tableName', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
+    const db = new Database(dbPath);
+    db.prepare('INSERT INTO persons (first_name, last_name) VALUES (?, ?)').run('Peter', 'Pan');
+    db.prepare('INSERT INTO addresses (person_id, address1) VALUES (?, ?)').run(1, 'Planet X');
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Address = K8.require('models/Address');
+    const Person = K8.require('models/Person');
+
+    const peter = new Person(1);
+    expect(peter.first_name).toBe('Peter');
+
+    const home = new Address(1);
+    expect(home.address1).toBe('Planet X');
+
+    const owner = home.belongsTo('person_id');
+    expect(owner.first_name).toBe('Peter');
+
+
+    const office = new Address();
+    office.address1 = 'Planet Y';
+    office.person_id = peter.id;
+    office.save();
+
+    expect(office.address1).toBe('Planet Y');
+
+    Address.tableName = null;
+    const addresses = peter.hasMany(Address);
+    expect(addresses.length).toBe(2);
+    expect(Address.tableName).toBe('addresses');
+
+    Address.tableName = null;
+    expect(office.all().length).toBe(2);
+
+  });
+
+  test('no database', ()=>{
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(null);
+    const Person = K8.require('models/Person');
+    const peter = new Person();
+
+    try{
+      peter.save();
+      expect('this line should not be run').toBe('');
+    }catch(e){
+      expect(e.message).toBe('ORM Database not assigned. Please provide database with ORM.setDB(db)')
+    }
+
+  })
 });
