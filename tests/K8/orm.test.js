@@ -1,8 +1,18 @@
+const Database = require('better-sqlite3');
+const path = require('path');
+const fs = require('fs');
+
 describe('orm test', ()=>{
-    const K8 = require('../../K8');
-    const Database = require('better-sqlite3');
-    const fs = require('fs');
+  let K8;
+
+  beforeEach( () => {
+    K8 = require('../../K8');
     K8.init(__dirname, __dirname+'/orm/application', __dirname+'/test1/modules');
+  });
+
+  afterEach( () => {
+    K8 = null;
+  });
 
     test('orm', ()=>{
         const K8ORM = K8.require('ORM');
@@ -552,5 +562,71 @@ describe('orm test', ()=>{
       expect(e.message).toBe('ORM Database not assigned. Please provide database with ORM.setDB(db)')
     }
 
+  });
+
+  test('ORM idx', ()=>{
+    K8.init(__dirname+'/test11');
+
+    //idx is autoincrement primary key
+    const targetPath = path.normalize(__dirname+'/orm/db/empty.sqlite');
+    const sourcePath = path.normalize(__dirname+'/orm/db/empty.default.sqlite');
+    if(fs.existsSync(targetPath))fs.unlinkSync(targetPath);
+
+    fs.copyFileSync(sourcePath, targetPath);
+
+    const db = new Database(targetPath);
+    db.exec(`
+CREATE TABLE persons(
+id INTEGER UNIQUE DEFAULT ((( strftime('%s','now') - 1563741060 ) * 100000) + (RANDOM() & 65535)) NOT NULL ,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+first_name TEXT NOT NULL ,
+last_name TEXT NOT NULL ,
+phone TEXT ,
+email TEXT ,
+idx INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL); 
+
+CREATE TRIGGER persons_updated_at AFTER UPDATE ON persons WHEN old.updated_at < CURRENT_TIMESTAMP BEGIN
+UPDATE persons SET updated_at = CURRENT_TIMESTAMP WHERE id = old.id;
+END;
+`);
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Person = K8.require('models/Person');
+    const p = new Person();
+    p.first_name = 'Peter';
+    p.last_name = 'Pan';
+    p.save();
+
+    expect(p.idx).toBe(1);
+
+    const a = new Person();
+    a.first_name = 'Alice';
+    a.last_name = 'Lee';
+    a.save();
+
+    expect(a.idx).toBe(2);
+
   })
+
+  test('ORM load fail', ()=>{
+    const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+    if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
+    fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
+
+    const db = new Database(dbPath);
+    db.prepare('INSERT INTO persons (first_name, last_name) VALUES (?, ?)').run('Peter', 'Pan');
+
+
+    const ORM = require('../../classes/ORM');
+    ORM.setDB(db);
+
+    const Person = K8.require('models/Person');
+    const a = new Person('1000', {lazyload: true});
+    const loaded = a.load();
+    expect(loaded).toBe(false);
+  })
+
 });
