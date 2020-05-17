@@ -24,29 +24,28 @@ class Product extends ORM{
 
 Product.jointTablePrefix = 'product';
 Product.tableName = 'products';
-Product.key       = 'product_id';
 
-Product.fieldType = {
-  name : ['TEXT', 'NOT NULL'],
-  content : ['TEXT'],
-  handle : ['TEXT'],
-  title : ['TEXT'],
-  description : ['TEXT'],
-  template_suffix : ['TEXT'],
-  available : ['BOOLEAN']
-};
-
-Product.belongsTo = [
-  {fk: 'default_image_id', model: 'Image'},
-  {fk: 'type_id', model: 'Type'},
-  {fk: 'vendor_id', model: 'Vendor'}
+Product.fields = [
+  'name',
+  'content',
+  'handle',
+  'title',
+  'description',
+  'template_suffix',
+  'available'
 ];
 
-Product.hasMany   = [
-  {fk: 'product_id', model: 'Variant'},
-  {fk: 'product_id', model: 'LineItem'},
-  {fk: 'product_id', model: 'GiftCard'}
-];
+Product.belongsTo = new Map([
+  ['default_image_id', 'Image'],
+  ['type_id', 'Type'],
+  ['vendor_id', 'Vendor']
+]);
+
+Product.hasMany   = new Map([
+  ['product_id', 'Variant'],
+  ['product_id', 'LineItem'],
+  ['product_id', 'GiftCard']
+]);
 
 Product.belongsToMany = [
   'Tag',

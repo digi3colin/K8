@@ -25,33 +25,32 @@ class Address extends ORM{
 
 Address.jointTablePrefix = 'address';
 Address.tableName = 'addresses';
-Address.key       = 'address_id';
 
-Address.fieldType = {
-  address1 : ['TEXT', 'NOT NULL'],
-  address2 : ['TEXT'],
-  city : ['TEXT'],
-  company : ['TEXT'],
-  country : ['TEXT'],
-  country_code : ['TEXT'],
-  province : ['TEXT'],
-  province_code : ['TEXT'],
-  street : ['TEXT'],
-  zip : ['TEXT']
-};
-
-Address.belongsTo = [
-  {fk: 'person_id', model: 'Person'}
+Address.fields = [
+  "address1",
+  "address2",
+  "city",
+  "company",
+  "country",
+  "country_code",
+  "province",
+  "province_code",
+  "street",
+  "zip"
 ];
 
-Address.hasMany   = [
-  {fk: 'address_id', model: 'Customer'},
-  {fk: 'billing_address_id', model: 'Order'},
-  {fk: 'shipping_address_id', model: 'Order'},
-  {fk: 'address_id', model: 'Shop'},
-  {fk: 'shipping_address_id', model: 'Checkout'},
-  {fk: 'billing_address_id', model: 'Checkout'}
-];
+Address.belongsTo = new Map([
+  ['person_id', 'Person']
+]);
+
+Address.hasMany   = new Map([
+  ['address_id', 'Customer'],
+  ['billing_address_id', 'Order'],
+  ['shipping_address_id', 'Order'],
+  ['address_id', 'Shop'],
+  ['shipping_address_id', 'Checkout'],
+  ['billing_address_id', 'Checkout']
+]);
 
 Address.belongsToMany = [
   

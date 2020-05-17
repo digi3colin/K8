@@ -16,19 +16,16 @@ class Tag extends ORM{
 
 Tag.jointTablePrefix = 'tag';
 Tag.tableName = 'tags';
-Tag.key       = 'tag_id';
 
-Tag.fieldType = {
-  name : ['TEXT', 'NOT NULL']
-};
+Tag.fields = ['name'];
 
-Tag.belongsTo = [
+Tag.belongsTo = new Map([
   
-];
+]);
 
-Tag.hasMany   = [
+Tag.hasMany   = new Map([
   
-];
+]);
 
 Tag.belongsToMany = [
   

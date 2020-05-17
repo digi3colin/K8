@@ -18,23 +18,22 @@ class Person extends ORM{
 
 Person.jointTablePrefix = 'person';
 Person.tableName = 'persons';
-Person.key       = 'person_id';
 
-Person.fieldType = {
-  first_name : ['TEXT', 'NOT NULL'],
-  last_name : ['TEXT', 'NOT NULL'],
-  phone : ['TEXT'],
-  email : ['TEXT'],
-  idx   : ['INTEGER', 'PRIMARY KEY AUTOINCREMENT NOT NULL']
-};
+Person.fields = [
+  'first_name',
+  'last_name',
+  'phone',
+  'email',
+  'idx',
+];
 
-Person.belongsTo = [
+Person.belongsTo = new Map([
   
-];
+]);
 
-Person.hasMany   = [
-  {fk: 'person_id', model: 'User'}
-];
+Person.hasMany   = new Map([
+  ['person_id', 'User']
+]);
 
 Person.belongsToMany = [
   

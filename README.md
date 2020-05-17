@@ -32,17 +32,13 @@ module.exports = {
 ## ORM
 ORM provide following static variables:
 
-- ORM.lowercase
-  - lowercase name of the class
-- ORM.key
-  - local key of the class
 - ORM.tableName
   - table name of the class
-- ORM.fields
-  - fields of the class
+- ORM.jointTablePrefix
 - ORM.belongsTo
   - list of the class belongs
 - ORM.hasMany 
+- ORM.belongsToMany
 
 
 ## Controller

@@ -16,18 +16,9 @@
  *  along with K8MVC.  If not, see <https://www.gnu.org/licenses/>.
  */
 const pluralize = require('pluralize');
+pluralize.addPluralRule('person', 'persons');
 const K8 = require('../K8');
 const {Model} = require('@komino/k8-core-mvc');
-
-//static private function
-/**
- * has many
- * @param {typeof ORM} modelClass
- */
-function assignTableName(modelClass){
-  modelClass.jointTablePrefix = modelClass.name.toLowerCase();
-  modelClass.tableName = pluralize(modelClass.jointTablePrefix);
-}
 
 class ORM extends Model{
   constructor(id = null, options = {}){
@@ -35,7 +26,7 @@ class ORM extends Model{
     //private property this.db.
     Object.defineProperty(this, "db", {
       enumerable : false,
-      value : options.database
+      value : options.database || ORM.database
     });
 
     this.id = id;
@@ -44,13 +35,13 @@ class ORM extends Model{
 
     if(this.constructor !== ORM){
       if(!this.constructor.tableName){
-        assignTableName(this.constructor);
+        this.constructor.tableName = pluralize(this.constructor.name).toLowerCase();
       }
-
       if(!this.constructor.jointTablePrefix){
-        this.constructor.jointTablePrefix = this.constructor.tableName.replace(/s$/i, '')//singluar tableName;
+        this.constructor.jointTablePrefix = pluralize.singular(this.constructor.tableName);
       }
     }
+
 
     if( options.lazyload || !this.id )return;
     this.load();
@@ -70,9 +61,9 @@ class ORM extends Model{
    */
   save(){
     const tableName = this.constructor.tableName;
-    const columns = Object.keys(this.constructor.fieldType);
+    const columns = [...this.constructor.fields];
     //add belongsTo to columns
-    this.constructor.belongsTo.forEach(x => columns.push(x.fk));
+    Array.from(this.constructor.belongsTo.keys()).forEach(x => columns.push(x));
 
     const values = columns.map(x => this[x]);
 
@@ -104,8 +95,8 @@ class ORM extends Model{
     const Model = model.constructor;
 
     const jointTableName = `${this.constructor.jointTablePrefix}_${Model.tableName}`;
-    const lk = this.constructor.key;
-    const fk = Model.key;
+    const lk = this.constructor.jointTablePrefix + '_id';
+    const fk = Model.jointTablePrefix + '_id';
 
     const record = this.prepare(`SELECT * FROM ${jointTableName} WHERE ${lk} = ? AND ${fk} = ?`).get(this.id, model.id);
     if(record)return false;
@@ -122,8 +113,8 @@ class ORM extends Model{
   remove(model){
     const Model = model.constructor;
     const jointTableName = `${this.constructor.jointTablePrefix}_${Model.tableName}`;
-    const lk = this.constructor.key;
-    const fk = Model.key;
+    const lk = this.constructor.jointTablePrefix + '_id';
+    const fk = Model.jointTablePrefix + '_id';
 
     this.prepare(`DELETE FROM ${jointTableName} WHERE ${lk} = ? AND ${fk} = ?`).run(this.id, model.id);
   }
@@ -136,7 +127,7 @@ class ORM extends Model{
     //remove many to many
     this.constructor.belongsToMany.forEach(x => {
       const modelClass = K8.require(`models/${x}`);
-      const lk = this.constructor.key;
+      const lk = this.constructor.jointTablePrefix + '_id';
       const table = `${this.constructor.jointTablePrefix}_${modelClass.tableName}`;
       this.prepare(`DELETE FROM ${table} WHERE ${lk} = ?`).run(this.id);
     });
@@ -149,67 +140,43 @@ class ORM extends Model{
    */
 
   belongsTo(fk){
-    const modelName = this.constructor.belongsTo.find(x => x.fk === fk).model;
+    const modelName = this.constructor.belongsTo.get(fk);
     const modelClass = K8.require(`models/${modelName}`);
     return new modelClass(this[fk], {database: this.db});
   }
 
   /**
    * has many
-   * @param {typeof ORM} modelClass
+   * @param {ORM} modelClass
+   * @param {string} fk
    */
 
-  hasMany(modelClass){
-    if(!modelClass.tableName)assignTableName(modelClass);
+  hasMany(modelClass, fk= ""){
+    const key = (fk === "") ? this.constructor.name.toLowerCase() + '_id' : fk;
 
-    const key = this.constructor.key;
-    return this.prepare(`SELECT * FROM ${modelClass.tableName} WHERE ${key} = ?`).all(this.id).map(x => Object.assign(new modelClass(null, {database : this.db}), x));
+    return this.prepare(`SELECT * FROM ${modelClass.tableName} WHERE ${key} = ?`)
+      .all(this.id)
+      .map(x => Object.assign(new modelClass(null, {database : this.db}), x));
   }
 
   /**
    *
-   * @param {typeof ORM} modelClass
+   * @param {ORM} modelClass
    */
   belongsToMany(modelClass){
-    const jointTableName = this.constructor.jointTablePrefix + '_' +modelClass.tableName;
+    const jointTableName = this.constructor.jointTablePrefix + '_' + modelClass.tableName;
 
-    const sql = `SELECT ${modelClass.tableName}.* FROM ${modelClass.tableName} JOIN ${jointTableName} ON ${modelClass.tableName}.id = ${jointTableName}.${modelClass.key} WHERE ${jointTableName}.${this.constructor.key} = ? ORDER BY ${jointTableName}.weight`;
-    return this.prepare(sql).all(this.id).map(x => Object.assign(new modelClass(null, {database : this.db}), x));
+    const sql = `SELECT ${modelClass.tableName}.* FROM ${modelClass.tableName} JOIN ${jointTableName} ON ${modelClass.tableName}.id = ${jointTableName}.${modelClass.jointTablePrefix}_id WHERE ${jointTableName}.${this.constructor.jointTablePrefix}_id = ? ORDER BY ${jointTableName}.weight`;
+    return this.prepare(sql)
+      .all(this.id)
+      .map(x => Object.assign(new modelClass(null, {database : this.db}), x));
   }
-
-  /**
-   *
-   * @param {Database} db
-   */
-  static setDB(db){
-    ORM.db = db;
-  }
-
 
   all(){
     const model = this.constructor;
-    if(!model.tableName)assignTableName(model);
-    return this.prepare(`SELECT * from ${model.tableName}`).all().map(x => Object.assign(new model(null, {database: this.db}), x));
-  }
-
-  /**
-   *
-   * @param {typef ORM} modelClass
-   * @returns {Array}
-   */
-  static all(modelClass) {
-    const m = new modelClass();
-    return m.all();
-  }
-
-  /**
-   *
-   * @param {typeof ORM} modelClass
-   * @param {Number} id
-   * @returns {Object}
-   */
-  static get(modelClass, id){
-    return new modelClass(id);
+    return this.prepare(`SELECT * from ${model.tableName}`)
+      .all()
+      .map(x => Object.assign(new model(null, {database: this.db}), x));
   }
 
   /**
@@ -217,24 +184,20 @@ class ORM extends Model{
    * @param {string} sql
    */
   prepare(sql){
-    if(this.db)return this.db.prepare(sql);
-    return ORM.prepare(sql);
-  }
-
-  static prepare(sql){
-    if(!ORM.db)throw new Error('ORM Database not assigned. Please provide database with ORM.setDB(db)');
-    return ORM.db.prepare(sql);
+    if(!this.db)throw new Error('Database not assigned.');
+    return this.db.prepare(sql);
   }
 }
 
-//ORM is abstract, jointTablePrefix and tableName must be undefined.
-ORM.jointTablePrefix = undefined;
-ORM.tableName = undefined;
-ORM.key = undefined;
-ORM.fieldType = {};
-ORM.belongsTo = [];
-ORM.hasMany   = [];
+//ORM is abstract, jointTablePrefix and tableName is null.
+ORM.jointTablePrefix = null;
+ORM.tableName = null;
+ORM.database = null;
+
+ORM.belongsTo = new Map();
+ORM.hasMany   = new Map();
 ORM.belongsToMany = [];
+ORM.fields = [];
 
 Object.freeze(ORM.prototype);
 module.exports = ORM;
