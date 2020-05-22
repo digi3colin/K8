@@ -26,31 +26,31 @@ class Address extends ORM{
 Address.jointTablePrefix = 'address';
 Address.tableName = 'addresses';
 
-Address.fields = [
-  "address1",
-  "address2",
-  "city",
-  "company",
-  "country",
-  "country_code",
-  "province",
-  "province_code",
-  "street",
-  "zip"
-];
+Address.fields = new Map([
+  ["address1", "String!"],
+  ["address2", "String"],
+  ["city", "String"],
+  ["company", "String"],
+  ["country", "String"],
+  ["country_code", "String"],
+  ["province", "String"],
+  ["province_code", "String"],
+  ["street", "String"],
+  ["zip", "String"],
+]);
 
 Address.belongsTo = new Map([
   ['person_id', 'Person']
 ]);
 
-Address.hasMany   = new Map([
+Address.hasMany = [
   ['address_id', 'Customer'],
   ['billing_address_id', 'Order'],
   ['shipping_address_id', 'Order'],
   ['address_id', 'Shop'],
   ['shipping_address_id', 'Checkout'],
   ['billing_address_id', 'Checkout']
-]);
+];
 
 Address.belongsToMany = [
   

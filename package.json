@@ -1,6 +1,6 @@
 {
   "name": "@komino/k8",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "description": "Node.js MVC file structure base on Kohana Framework",
   "main": "index.js",
   "scripts": {

@@ -25,15 +25,15 @@ class Product extends ORM{
 Product.jointTablePrefix = 'product';
 Product.tableName = 'products';
 
-Product.fields = [
-  'name',
-  'content',
-  'handle',
-  'title',
-  'description',
-  'template_suffix',
-  'available'
-];
+Product.fields = new Map([
+  ['name', 'String'],
+  ['content', 'String'],
+  ['handle', 'String'],
+  ['title', 'String'],
+  ['description', 'String'],
+  ['template_suffix', 'String'],
+  ['available', 'Boolean!'],
+]);
 
 Product.belongsTo = new Map([
   ['default_image_id', 'Image'],
@@ -41,11 +41,11 @@ Product.belongsTo = new Map([
   ['vendor_id', 'Vendor']
 ]);
 
-Product.hasMany   = new Map([
+Product.hasMany = [
   ['product_id', 'Variant'],
   ['product_id', 'LineItem'],
   ['product_id', 'GiftCard']
-]);
+];
 
 Product.belongsToMany = [
   'Tag',

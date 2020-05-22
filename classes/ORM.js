@@ -61,7 +61,7 @@ class ORM extends Model{
    */
   save(){
     const tableName = this.constructor.tableName;
-    const columns = [...this.constructor.fields];
+    const columns = [...this.constructor.fields.keys()];
     //add belongsTo to columns
     Array.from(this.constructor.belongsTo.keys()).forEach(x => columns.push(x));
 
@@ -194,10 +194,10 @@ ORM.jointTablePrefix = null;
 ORM.tableName = null;
 ORM.database = null;
 
+ORM.fields = new Map();
 ORM.belongsTo = new Map();
-ORM.hasMany   = new Map();
+ORM.hasMany   = [];//hasMany cannot be Map, because children models may share same fk name.
 ORM.belongsToMany = [];
-ORM.fields = [];
 
 Object.freeze(ORM.prototype);
 module.exports = ORM;

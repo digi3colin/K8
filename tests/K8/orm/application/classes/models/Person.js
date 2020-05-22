@@ -20,22 +20,22 @@ class Person extends ORM{
 Person.jointTablePrefix = 'person';
 Person.tableName = 'persons';
 
-Person.fields = [
-  'first_name',
-  'last_name',
-  'phone',
-  'email'
-];
+Person.fields = new Map([
+  ['first_name', 'String'],
+  ['last_name', 'String'],
+  ['phone', 'String'],
+  ['email', 'String']
+]);
 
 Person.belongsTo = new Map([
   
 ]);
 
-Person.hasMany   = new Map([
+Person.hasMany = [
   ['person_id', 'Address'],
   ['person_id', 'User'],
   ['person_id', 'Customer']
-]);
+];
 
 Person.belongsToMany = [
   

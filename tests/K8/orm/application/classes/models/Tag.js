@@ -17,15 +17,17 @@ class Tag extends ORM{
 Tag.jointTablePrefix = 'tag';
 Tag.tableName = 'tags';
 
-Tag.fields = ['name'];
+Tag.fields = new Map([
+  ['name', 'String']
+]);
 
 Tag.belongsTo = new Map([
   
 ]);
 
-Tag.hasMany   = new Map([
+Tag.hasMany = [
   
-]);
+];
 
 Tag.belongsToMany = [
   
