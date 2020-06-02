@@ -65,9 +65,16 @@ class ORM extends Model{
     //add belongsTo to columns
     Array.from(this.constructor.belongsTo.keys()).forEach(x => columns.push(x));
 
-    const values = columns.map(x => this[x]);
+    const values = columns.map(x => {
+      const value = this[x];
+      if(typeof value === 'boolean'){
+        return this[x] ? 'TRUE' : 'FALSE';
 
-    let sql = '';
+      }
+      return this[x]
+    });
+
+    let sql;
     if(this.id){
       sql = `UPDATE ${tableName} SET ${columns.map(x => `${x} = ?`).join(', ')} WHERE id = ?`;
     }else{

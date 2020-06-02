@@ -1,6 +1,6 @@
 {
   "name": "@komino/k8",
-  "version": "0.3.3",
+  "version": "0.3.8",
   "description": "Node.js MVC file structure base on Kohana Framework",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/digi3colin/K8#readme",
   "dependencies": {
-    "@komino/k8-core-mvc": "0.0.10",
+    "@komino/k8-core-mvc": "0.0.12",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
