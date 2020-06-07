@@ -22,6 +22,7 @@ const path = require('path');
 
 //private methods
 const resolve = (pathToFile, prefixPath, store)=>{
+
   if(!store[pathToFile]){
     //search application, then modules, then system
     const fetchList = [pathToFile, `${K8.APP_PATH}/${prefixPath}/${pathToFile}`];
@@ -51,7 +52,7 @@ const setPath = (EXE_PATH, APP_PATH, MOD_PATH) => {
   K8.MOD_PATH = MOD_PATH || K8.EXE_PATH + '/modules';
 
   const bootstrapFile = `${K8.APP_PATH}/bootstrap.js`;
-  if(fs.existsSync(bootstrapFile)){
+  if(fs.existsSync(path.normalize(bootstrapFile))){
     K8.bootstrap = require(bootstrapFile);
   }
 };
@@ -61,12 +62,12 @@ const updateConfig = () => {
   const file = resolve('site.js', 'config', K8.configPath);
 
   K8.config = require(file);
-  delete require.cache[file];
+  delete require.cache[path.normalize(file)];
 };
 
 const clearRequireCache = ()=>{
   for(let name in K8.classPath){
-    delete require.cache[K8.classPath[name]];
+    delete require.cache[path.normalize(K8.classPath[name])];
   }
   K8.classPath = {};
   K8.configPath = {};
@@ -82,18 +83,18 @@ const reloadModuleInit = () => {
   K8.bootstrap.modules.forEach(x => {
     const initPath = `${K8.MOD_PATH}/${x}/init.js`;
 
-    if(fs.existsSync(initPath)){
+    if(fs.existsSync(path.normalize(initPath))){
       require(initPath);
-      delete require.cache[initPath];
+      delete require.cache[path.normalize(initPath)];
     }
   });
 
   //activate init.js in require('k8mvc-sample-module')
   K8.nodePackages.forEach(x =>{
     const initPath = `${x}/init.js`;
-    if(fs.existsSync(initPath)){
+    if(fs.existsSync(path.normalize(initPath))){
       require(initPath);
-      delete require.cache[initPath];
+      delete require.cache[path.normalize(initPath)];
     }
   })
 };
@@ -148,5 +149,5 @@ class K8 {
   }
 }
 
-K8.VERSION  = '0.3.12';
+K8.VERSION  = '0.3.13';
 module.exports = K8;
