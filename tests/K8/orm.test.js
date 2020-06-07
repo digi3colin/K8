@@ -35,7 +35,7 @@ describe('orm test', ()=>{
     });
 
     test('DB test', () =>{
-        const dbPath = __dirname+'/orm/db/db.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/db.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         const db = new Database(dbPath);
 
@@ -50,7 +50,7 @@ describe('orm test', ()=>{
     });
 
     test('ORM.setDB', ()=>{
-        const dbPath = __dirname+'/orm/db/db.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/db1.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         const db = new Database(dbPath);
 
@@ -75,7 +75,7 @@ describe('orm test', ()=>{
     });
 
     test('ORM instance setDB', ()=>{
-        const dbPath = __dirname+'/orm/db/db.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/db2.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         const db = new Database(dbPath);
 
@@ -99,7 +99,7 @@ describe('orm test', ()=>{
 
 
     test('alias model', ()=>{
-        const dbPath = __dirname+'/orm/db/db.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/db3.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         const db = new Database(dbPath);
 
@@ -121,7 +121,7 @@ describe('orm test', ()=>{
     });
 
     test('belongsTo', () =>{
-        const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsTo4.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -156,7 +156,7 @@ describe('orm test', ()=>{
     });
 
     test('instance belongsTo', () =>{
-        const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsTo5.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -179,7 +179,7 @@ describe('orm test', ()=>{
     });
 
     test('belongsToMany', () =>{
-        const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany6.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -206,7 +206,7 @@ describe('orm test', ()=>{
     });
 
     test('instance belongsToMany', () =>{
-        const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany7.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -233,7 +233,7 @@ describe('orm test', ()=>{
     });
 
     test('ORM get all from model', ()=>{
-        const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany8.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -252,7 +252,7 @@ describe('orm test', ()=>{
     });
 
     test('instance get all from model', ()=>{
-        const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+        const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany9.sqlite');
         if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
         fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
         const db = new Database(dbPath);
@@ -269,7 +269,7 @@ describe('orm test', ()=>{
     });
 
     test('enumerate', ()=>{
-      const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+      const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany10.sqlite');
       if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
       fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
       const db = new Database(dbPath);
@@ -284,7 +284,7 @@ describe('orm test', ()=>{
     });
 
     test('save', ()=>{
-      const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+      const dbPath = path.normalize(__dirname+'/orm/db/belongsTo11.sqlite');
       if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
       fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
       const db = new Database(dbPath);
@@ -302,7 +302,7 @@ describe('orm test', ()=>{
     });
 
     test('create new record', ()=>{
-      const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+      const dbPath = path.normalize(__dirname+'/orm/db/belongsTo12.sqlite');
       if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
       fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
       const db = new Database(dbPath);
@@ -320,7 +320,7 @@ describe('orm test', ()=>{
     });
 
     test('add belongsToMany', ()=>{
-      const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+      const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany13.sqlite');
       if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
       fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
       const db = new Database(dbPath);
@@ -352,7 +352,7 @@ describe('orm test', ()=>{
     })
 
   test('add duplicate belongsToMany', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany14.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -381,7 +381,7 @@ describe('orm test', ()=>{
   });
 
   test('remove belongsToMany', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany15.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -409,7 +409,7 @@ describe('orm test', ()=>{
   });
 
   test('delete', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany16.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -428,7 +428,7 @@ describe('orm test', ()=>{
   });
 
   test('delete and remove links', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany17.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -461,7 +461,7 @@ describe('orm test', ()=>{
   });
 
   test('lazy load', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany18.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -481,7 +481,7 @@ describe('orm test', ()=>{
   });
 
   test('delete unsaved object', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsToMany.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsToMany19.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsToMany.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -498,7 +498,7 @@ describe('orm test', ()=>{
   })
 
   test('handle hasMany target without tableName', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsTo20.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
     const db = new Database(dbPath);
@@ -596,7 +596,7 @@ END;
   })
 
   test('ORM load fail', ()=>{
-    const dbPath = __dirname+'/orm/db/belongsTo.sqlite';
+    const dbPath = path.normalize(__dirname+'/orm/db/belongsTo22.sqlite');
     if(fs.existsSync(dbPath))fs.unlinkSync(dbPath);
     fs.copyFileSync(__dirname+'/orm/db/belongsTo.default.sqlite', dbPath);
 

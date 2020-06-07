@@ -69,7 +69,6 @@ class ORM extends Model{
       const value = this[x];
       if(typeof value === 'boolean'){
         return this[x] ? 'TRUE' : 'FALSE';
-
       }
       return this[x]
     });

@@ -18,6 +18,7 @@
 
 const fs = require('fs');
 const {View} = require('@komino/k8-core-mvc');
+const path = require('path');
 
 //private methods
 const resolve = (pathToFile, prefixPath, store)=>{
@@ -30,7 +31,7 @@ const resolve = (pathToFile, prefixPath, store)=>{
 
     for(let i=0; i<fetchList.length; i++){
       const x = fetchList[i];
-      if(fs.existsSync(x)){
+      if(fs.existsSync(path.normalize(x))){
         store[pathToFile] = x;
         break;
       }
@@ -107,7 +108,7 @@ class K8 {
     K8.configPath = {}; //{'site.js       => 'APP_PATH/config/site.js'}
 
     K8.bootstrap = {modules: []};
-    K8.SYS_PATH = require.resolve(`./K8`).replace('/K8.js', '');
+    K8.SYS_PATH = require.resolve(`./K8`).replace(/[\/\\]K8\.js$/, '');
 
     //set paths
     setPath(EXE_PATH, APP_PATH, MOD_PATH);
@@ -119,7 +120,7 @@ class K8 {
 
   static addNodeModules(packageFolder){
     //register by require('k8mvc-module');
-    K8.nodePackages.push(packageFolder.replace('/index.js', ''));
+    K8.nodePackages.push(packageFolder.replace(/[\/\\]index\.js$/, ''));
   }
 
   static validateCache(){
@@ -147,5 +148,5 @@ class K8 {
   }
 }
 
-K8.VERSION  = '0.3.7';
+K8.VERSION  = '0.3.12';
 module.exports = K8;

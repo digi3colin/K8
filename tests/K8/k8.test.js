@@ -173,7 +173,7 @@ describe('k8 test', ()=>{
   test('setPath default value', ()=>{
     const path = require('path');
     K8.init();
-    expect(K8.EXE_PATH + '/').toBe(path.normalize(__dirname+'/../../'));
+    expect(path.normalize(K8.EXE_PATH + '/')).toBe(path.normalize(__dirname+'/../../'));
   });
 
   test('set all init value', ()=>{
